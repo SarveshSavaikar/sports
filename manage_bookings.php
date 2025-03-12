@@ -18,7 +18,7 @@ if (isset($_GET['action']) && isset($_GET['bookings_id'])) {
     if($current_user_role == 'admin'){
         
         if ($action == 'approve' || $action == 'deny') {
-            $status = ($action == 'approve') ? 'approved' : 'denied';
+            $status = ($action == 'approve') ? 'accepted' : 'rejected';
     
             // Update the status in the database
             $query = "UPDATE bookings SET adminstatus = ? WHERE bookings_id = ?";
@@ -55,7 +55,12 @@ if (isset($_GET['edit_action']) && isset($_GET['bookings_id'])) {
 
     if ($edit_action == 'reverse') {
         // Reverse the status of the booking (accepted to pending or rejected to pending)
-        $query = "UPDATE bookings SET status = 'pending' WHERE bookings_id = ?";
+        if($_SESSION['user']['role'] == 'admin'){
+            $query = "UPDATE bookings SET adminstatus = 'pending' WHERE bookings_id = ?";
+        }
+        else{
+            $query = "UPDATE bookings SET status = 'pending' WHERE bookings_id = ?";
+        }
         $stmt = $conn->prepare($query);
         $stmt->bind_param("i", $bookings_id);
         $stmt->execute();
@@ -77,7 +82,7 @@ if($_SESSION['user']['role'] == 'admin'){
                  bookings.total_time, bookings.total_price, bookings.status ,bookings.adminstatus , bookings.bookings_id
           FROM bookings
           JOIN users ON bookings.id = users.id
-          WHERE bookings.status = 'accepted' AND bookings.adminstatus = 'pending'"; // Fixed the join to correctly reference user_id
+          WHERE bookings.status = 'accepted' AND ( bookings.adminstatus = 'pending' or bookings.adminstatus = 'accepted' or bookings.adminstatus = 'rejected')"; // Fixed the join to correctly reference user_id
     $result = $conn->query($query);
 }
 ?>
