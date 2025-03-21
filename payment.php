@@ -31,6 +31,20 @@ if ($result->num_rows == 0) {
 // Calculate total amount
 while ($row = $result->fetch_assoc()) {
     $total += $row['price'] * $row['quantity'];
+    $sql = "SELECT description FROM equipment WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $row['equipment_id']);
+    $stmt->execute();
+    $description = $stmt->get_result();
+    $description = $description->fetch_assoc();
+    $description = $description['description'];
+    // echo $description;
+
+    $sql = "UPDATE cart SET descriptions = ? WHERE equipment_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("si", $description, $row['equipment_id']);
+    $stmt->execute();
+
 }
 
 // Process payment status
@@ -113,6 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .payment-container {
             width: 60%;
             margin: auto;
+            margin-top: 120px;
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 10px;
@@ -121,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         .payment-item {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-evenly;
             align-items: center;
             padding: 10px;
             border-bottom: 1px solid #ddd;
@@ -138,6 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             font-size: 1.2rem;
             text-align: right;
             margin-top: 20px;
+            padding-right: 120px;
         }
 
         .payment-methods {
@@ -162,6 +178,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             background: #dc3545;
             color: #fff;
         }
+        .description-box {
+            display: flex;
+            width: 200px;
+            /* background-color: #dc3545; */
+            /* justify-content: space-between; */
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .description-box h5 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: lighter;
+        }
     </style>
 </head>
 
@@ -174,7 +204,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $item_total = $row['price'] * $row['quantity'];
         ?>
             <div class="payment-item">
-                <img src="<?php echo htmlspecialchars($row['photo']); ?>" alt="Equipment Image">
+                <img src="<?php echo htmlspecialchars($row['photo']); ?>" alt="Equipment Image" style="width: 100px; height: 100px;">
+                <div class="description-box"><p><h5><?php echo htmlspecialchars($row['descriptions']); ?></h5></p></div>
                 <div>
                     <strong><?php echo htmlspecialchars($row['equipment_name']); ?></strong>
                     <p>Price: Rs.<?php echo number_format($row['price'], 2); ?></p>

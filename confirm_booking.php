@@ -21,7 +21,8 @@ $start_time = $_GET['start_time'];
 $end_time = $_GET['end_time'];
 $total_time = $_GET['total_time'];
 $total_price = $_GET['total_price'];
-
+$JSON = $_GET['JSON'];
+$number_of_dates = $_GET['number_of_dates'];
 // Fetch ground details
 $stmt = $conn->prepare("SELECT name, price FROM grounds WHERE id = ?");
 $stmt->bind_param("i", $ground_id);
@@ -33,14 +34,15 @@ $stmt->close();
 // Confirm booking process
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $payment_status = $_POST['payment_status']; // 'yes' or 'no'
+    $number_of_dates = $_POST['number_of_dates'];
 
     if ($payment_status == 'yes') {
         $bookings_id = strtotime("now") . $customer_id; // Generate a unique booking ID
         // Insert booking details into the database
-        $stmt = $conn->prepare("INSERT INTO bookings (id, ground_id, start_date, end_date, start_time, end_time, total_time, total_price, payment_status, status , bookings_id) 
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)");
+        $stmt = $conn->prepare("INSERT INTO bookings (id, ground_id, start_date, end_date, start_time, end_time, total_time, total_price, payment_status, status , bookings_id , booking_slots) 
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,? , ?)");
         $status = 'pending'; // Initial status
-        $stmt->bind_param("iissssddsss", $customer_id, $ground_id, $start_date, $end_date, $start_time, $end_time, $total_time, $total_price, $payment_status, $status , $bookings_id);
+        $stmt->bind_param("iissssddssss", $customer_id, $ground_id, $start_date, $end_date, $start_time, $end_time, $total_time, $total_price, $payment_status, $status, $bookings_id, $JSON);
 
         if ($stmt->execute()) {
             // Redirect to confirmation page
@@ -60,108 +62,111 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirm Booking</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-       body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-}
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
 
-header {
-    background-color: #4CAF50;
-    color: white;
-    text-align: center;
-    padding: 20px;
-}
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
 
-.container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: white;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 30px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-}
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+        }
 
- h2 {
-    text-align: center;
-    color: #333;
-}
-h1, h3 {
-    text-align: left;
-    color: #333;
-}
+        h2 {
+            text-align: center;
+            color: #333;
+        }
 
-p {
-    font-size: 16px;
-    line-height: 1.6;
-    color: #555;
-}
+        h1,
+        h3 {
+            text-align: left;
+            color: #333;
+        }
 
-.booking-details {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-}
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+        }
 
-.booking-details p {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 5px 0;
-    flex: 1 1 45%;
-}
+        .booking-details {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
 
-.confirmation-form {
-    text-align: center;
-    margin-top: 20px;
-}
+        .booking-details p {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 5px 0;
+            flex: 1 1 45%;
+        }
 
-.confirmation-form button {
-    padding: 12px 25px;
-    margin: 10px;
-    font-size: 18px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
+        .confirmation-form {
+            text-align: center;
+            margin-top: 20px;
+        }
 
-.confirmation-form button:hover {
-    background-color: #45a049;
-}
+        .confirmation-form button {
+            padding: 12px 25px;
+            margin: 10px;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
 
-.confirmation-form button:focus {
-    outline: none;
-}
+        .confirmation-form button:hover {
+            background-color: #45a049;
+        }
 
-.confirmation-form button[value="yes"] {
-    background-color: #4CAF50;
-    color: white;
-}
+        .confirmation-form button:focus {
+            outline: none;
+        }
 
-.confirmation-form button[value="no"] {
-    background-color: #f44336;
-    color: white;
-}
+        .confirmation-form button[value="yes"] {
+            background-color: #4CAF50;
+            color: white;
+        }
 
-.confirmation-form button[value="yes"]:hover {
-    background-color: #45a049;
-}
+        .confirmation-form button[value="no"] {
+            background-color: #f44336;
+            color: white;
+        }
 
-.confirmation-form button[value="no"]:hover {
-    background-color: #e53935;
-}
+        .confirmation-form button[value="yes"]:hover {
+            background-color: #45a049;
+        }
 
-img {
+        .confirmation-form button[value="no"]:hover {
+            background-color: #e53935;
+        }
+
+        img {
             max-width: 50%;
             height: auto;
             margin-top: 20px;
@@ -171,9 +176,9 @@ img {
             display: block;
             margin: 20px auto;
         }
-
     </style>
 </head>
+
 <body>
 
     <header>
@@ -184,17 +189,38 @@ img {
         <h1>Customer Details</h1>
         <h4><strong>Name:</strong> <?= htmlspecialchars($user['name']) ?></h4>
         <div class="booking-details">
-            
+
             <p><strong>Ground Name:</strong> <?= htmlspecialchars($ground['name']) ?></p>
             <p><strong>Price per Hour:</strong> ₹<?= htmlspecialchars($ground['price']) ?></p>
         </div>
 
         <h1>Booking Details</h1>
         <div class="booking-details">
-            <p><strong>Start Date:</strong> <?= htmlspecialchars($start_date) ?></p>
-            <p><strong>End Date:</strong> <?= htmlspecialchars($end_date) ?></p>
-            <p><strong>Start Time:</strong> <?= htmlspecialchars($start_time) ?></p>
-            <p><strong>End Time:</strong> <?= htmlspecialchars($end_time) ?></p>
+            <?php
+            // Ensure JSON is decoded properly
+            $data = json_decode($JSON, true);
+            echo "<pre>";
+            print_r($data);
+            echo "</pre>";
+            // Check if JSON decoding was successful
+            if ($data === null) {
+                echo "<p>Error: Invalid booking data.</p>";
+            } else {
+                foreach ($data as $key => $value) {
+                    // Ensure $value is an array before accessing indexes
+                    if (is_array($value) && count($value) >= 2) {
+            ?>
+                        <p><strong>Date:</strong> <?= htmlspecialchars($key) ?></p>
+                        <p><strong>Starting Time:</strong> <?= htmlspecialchars($value[0]) ?></p>
+                        <p><strong>Ending Time:</strong> <?= htmlspecialchars($value[1]) ?></p>
+            <?php
+                    } else {
+                        echo "<p>Error: Invalid time format for date $key.</p>";
+                    }
+                }
+            }
+            ?>
+
             <p><strong>Total Time:</strong> <?= htmlspecialchars($total_time) ?> hours</p>
             <p><strong>Total Price:</strong> ₹<?= htmlspecialchars($total_price) ?></p>
         </div>
@@ -210,4 +236,5 @@ img {
     </div>
 
 </body>
+
 </html>

@@ -131,7 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <div class="form-container">
     <?php if (empty($role)): ?>
-        <!-- Step 1: Ask for the professional role -->
+        <!-- Step 1: Ask for the professional role --> 
         <form action="book_appointment.php" method="post">
             <label for="role">Choose Role:</label>
             <select id="role" name="role" required>

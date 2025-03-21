@@ -10,7 +10,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'customer') {
 
 // Get the user's cart items
 $customer_id = $_SESSION['user']['id']; // Assuming the user's ID is stored in the session
-$sql = "SELECT c.*, e.name AS equipment_name, e.price, e.photo
+$sql = "SELECT c.*, e.name AS equipment_name, e.price, e.photo , e.description
         FROM cart c
         JOIN equipment e ON c.equipment_id = e.id
         WHERE c.customer_id = $customer_id";

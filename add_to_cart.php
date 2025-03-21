@@ -21,11 +21,12 @@ if (isset($_POST['equipment_id']) && isset($_POST['quantity'])) {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $available_quantity = $row['quantity'];
+        $description = $row['description'];
 
         // Check if enough stock is available
         if ($quantity <= $available_quantity) {
             // Insert the item into the cart table
-            $insert_sql = "INSERT INTO cart (customer_id, equipment_id, quantity) VALUES ($customer_id, $equipment_id, $quantity)";
+            $insert_sql = "INSERT INTO cart (customer_id, equipment_id, quantity  ) VALUES ($customer_id, $equipment_id, $quantity )";
             $conn->query($insert_sql);
 
             // Redirect to the cart page or other page
