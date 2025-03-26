@@ -110,12 +110,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             font-size: 16px;
             line-height: 1.6;
             color: #555;
+            font-size: large;
         }
 
         .booking-details {
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-between;
+            justify-content: space-around;
         }
 
         .booking-details p {
@@ -199,9 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <?php
             // Ensure JSON is decoded properly
             $data = json_decode($JSON, true);
-            echo "<pre>";
-            print_r($data);
-            echo "</pre>";
+
             // Check if JSON decoding was successful
             if ($data === null) {
                 echo "<p>Error: Invalid booking data.</p>";
@@ -209,10 +208,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 foreach ($data as $key => $value) {
                     // Ensure $value is an array before accessing indexes
                     if (is_array($value) && count($value) >= 2) {
-            ?>
-                        <p><strong>Date:</strong> <?= htmlspecialchars($key) ?></p>
-                        <p><strong>Starting Time:</strong> <?= htmlspecialchars($value[0]) ?></p>
-                        <p><strong>Ending Time:</strong> <?= htmlspecialchars($value[1]) ?></p>
+            ?> <div style="height: 200px; overflow-y: auto;">
+
+                            <p><strong>Date:</strong> <?= htmlspecialchars($key) ?></p>
+
+                            <p><strong>Starting Time:</strong> <?= htmlspecialchars($value[0]) ?></p>
+                            <p><strong>Ending Time:</strong> <?= htmlspecialchars($value[1]) ?></p>
+                        </div>
             <?php
                     } else {
                         echo "<p>Error: Invalid time format for date $key.</p>";
@@ -221,9 +223,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
             ?>
 
-            <p><strong>Total Time:</strong> <?= htmlspecialchars($total_time) ?> hours</p>
-            <p><strong>Total Price:</strong> ₹<?= htmlspecialchars($total_price) ?></p>
         </div>
+
+        <p><strong>Total Time: <?= htmlspecialchars($total_time) ?> hours </strong></p>
+        <p><strong>Total Price: ₹<?= htmlspecialchars($total_price) ?></strong></p>
 
 
         <h2>Confirm Booking</h2>

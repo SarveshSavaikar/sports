@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $start_time = $_POST['starttime' . $i];
         $end_time = $_POST['enddate' . $i];
         echo "<script>console.log('$start_time')</script>";
-        $booking_slots["$date"] = [$starting_time , $end_time];
+        $booking_slots["$date"] = [$start_time , $end_time];
         $date_end = [$_POST['date'.$i], $_POST['endtime'.$i]];
         $duration += calculate_working_hours(strtotime($date . ' ' . $start_time), strtotime($date. ' ' . $end_time));
     }
