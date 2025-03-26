@@ -13,11 +13,12 @@ include 'db_connection.php';
 $professional_id = $_SESSION['user']['id'];
 
 // Fetch the pending, confirmed, or rejected appointments for the logged-in professional
-$query = "SELECT a.id, a.customer_name, a.appointment_date, a.appointment_time, u.prize_charged, a.status , a.adminstatus
+$query = "SELECT a.appointment_id ,a.id, a.customer_name, a.appointment_date, a.appointment_time, u.prize_charged, a.status , a.adminstatus
           FROM appointments a
           JOIN users u ON u.id = a.professional_id
           WHERE a.professional_id = '$professional_id' AND (a.status = 'pending' OR a.status = 'confirmed' OR a.status = 'rejected')";
 $result = $conn->query($query);
+// echo "re-ran the query";
 
 if($_SESSION['user']['role'] == 'admin'){
     $query = "SELECT a.id, a.customer_name, a.appointment_date, a.appointment_time, u.prize_charged, a.status , a.adminstatus
@@ -37,16 +38,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $appointment_id = $_POST['appointment_id'];
 
     if ($action == 'accept') {
-        $update_query = "UPDATE appointments SET status = 'confirmed' WHERE id = '$appointment_id'";
+        $update_query = "UPDATE appointments SET status = 'confirmed' WHERE appointment_id = '$appointment_id'";
         $conn->query($update_query);
         echo "Appointment confirmed!";
+        echo $appointment_id;
     } elseif ($action == 'reject') {
-        $update_query = "UPDATE appointments SET status = 'rejected' WHERE id = '$appointment_id'";
+        $update_query = "UPDATE appointments SET status = 'rejected' WHERE appointment_id = '$appointment_id'";
         $conn->query($update_query);
+        echo $appointment_id;
         echo "Appointment rejected!";
     } elseif ($action == 'reverse') {
-        $update_query = "UPDATE appointments SET status = 'pending' WHERE id = '$appointment_id'";
+        $update_query = "UPDATE appointments SET status = 'pending' WHERE appointment_id = '$appointment_id'";
         $conn->query($update_query);
+        echo $appointment_id;
         echo "Appointment status reversed to pending!";
     }
 
@@ -132,12 +136,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <form action="professional_dashboard.php" method="POST" style="display:inline;">
                             <button type="submit" name="action" value="accept">Accept</button>
                             <button type="submit" name="action" value="reject" class="reject">Reject</button>
-                            <input type="hidden" name="appointment_id" value="<?= $appointment['id']; ?>">
+                            <input type="hidden" name="appointment_id" value="<?= $appointment['appointment_id']; ?>">
                         </form>
                     <?php elseif ($appointment['status'] == 'confirmed' || $appointment['status'] == 'rejected'): ?>
                         <form action="professional_dashboard.php" method="POST" style="display:inline;">
                             <button type="submit" name="action" value="reverse" class="reverse">Reverse</button>
-                            <input type="hidden" name="appointment_id" value="<?= $appointment['id']; ?>">
+                            <input type="hidden" name="appointment_id" value="<?= $appointment['appointment_id']; ?>">
                         </form>
                     <?php endif; ?>
                 </td>
