@@ -21,10 +21,10 @@ $result = $conn->query($query);
 // echo "re-ran the query";
 
 if($_SESSION['user']['role'] == 'admin'){
-    $query = "SELECT a.id, a.customer_name, a.appointment_date, a.appointment_time, u.prize_charged, a.status , a.adminstatus
+    $query = "SELECT a.id, a.customer_name, a.appointment_date, a.appointment_time, u.prize_charged, a.status , a.adminstatus , a.appointment_id
           FROM appointments a
           JOIN users u ON u.id = a.professional_id
-          WHERE a.adminstatus = 'pending' and a.status = 'confirmed'";  // Corrected to filter by customer_id
+          WHERE  a.status = 'confirmed'";  // Corrected to filter by customer_id
           $result = $conn->query($query);
 }
 
@@ -37,21 +37,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $action = $_POST['action'];
     $appointment_id = $_POST['appointment_id'];
 
-    if ($action == 'accept') {
-        $update_query = "UPDATE appointments SET status = 'confirmed' WHERE appointment_id = '$appointment_id'";
-        $conn->query($update_query);
-        echo "Appointment confirmed!";
-        echo $appointment_id;
-    } elseif ($action == 'reject') {
-        $update_query = "UPDATE appointments SET status = 'rejected' WHERE appointment_id = '$appointment_id'";
-        $conn->query($update_query);
-        echo $appointment_id;
-        echo "Appointment rejected!";
-    } elseif ($action == 'reverse') {
-        $update_query = "UPDATE appointments SET status = 'pending' WHERE appointment_id = '$appointment_id'";
-        $conn->query($update_query);
-        echo $appointment_id;
-        echo "Appointment status reversed to pending!";
+    if ($_SESSION['user']['role'] == 'admin') {
+        if ($action == 'accept') {
+            $update_query = "UPDATE appointments SET adminstatus = 'confirmed' WHERE appointment_id = '$appointment_id'";
+            $conn->query($update_query);
+        } elseif ($action == 'reject') {
+            $update_query = "UPDATE appointments SET adminstatus = 'rejected' WHERE appointment_id = '$appointment_id'";
+            $conn->query($update_query);
+        } elseif ($action == 'reverse') {
+            $update_query = "UPDATE appointments SET adminstatus = 'pending' WHERE appointment_id = '$appointment_id'";
+            $conn->query($update_query);
+        }
+    } else {
+        if ($action == 'accept') {
+            $update_query = "UPDATE appointments SET status = 'confirmed' WHERE appointment_id = '$appointment_id'";
+            $conn->query($update_query);
+        } elseif ($action == 'reject') {
+            $update_query = "UPDATE appointments SET status = 'rejected' WHERE appointment_id = '$appointment_id'";
+            $conn->query($update_query);
+        } elseif ($action == 'reverse') {
+            $update_query = "UPDATE appointments SET status = 'pending' WHERE appointment_id = '$appointment_id'";
+            $conn->query($update_query);
+        }
     }
 
     // Redirect to avoid resubmission of form
@@ -132,17 +139,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <td>₹<?= htmlspecialchars($appointment['prize_charged']); ?></td>
                 <td><?= ucfirst($appointment['status']); ?></td>
                 <td>
-                    <?php if ($appointment['status'] == 'pending'): ?>
+                    <?php if ( $_SESSION['user']['role'] == "admin") : ?>
+                        <?php if ($appointment['adminstatus'] == 'pending'): ?>
                         <form action="professional_dashboard.php" method="POST" style="display:inline;">
                             <button type="submit" name="action" value="accept">Accept</button>
                             <button type="submit" name="action" value="reject" class="reject">Reject</button>
                             <input type="hidden" name="appointment_id" value="<?= $appointment['appointment_id']; ?>">
                         </form>
-                    <?php elseif ($appointment['status'] == 'confirmed' || $appointment['status'] == 'rejected'): ?>
+                        <?php elseif ($appointment['adminstatus'] == 'confirmed' || $appointment['status'] == 'rejected'): ?>
                         <form action="professional_dashboard.php" method="POST" style="display:inline;">
                             <button type="submit" name="action" value="reverse" class="reverse">Reverse</button>
                             <input type="hidden" name="appointment_id" value="<?= $appointment['appointment_id']; ?>">
                         </form>
+                        <?php endif; ?>
+                    <?php else : ?>
+                        <?php if ($appointment['status'] == 'pending'): ?>
+                        <form action="professional_dashboard.php" method="POST" style="display:inline;">
+                            <button type="submit" name="action" value="accept">Accept</button>
+                            <button type="submit" name="action" value="reject" class="reject">Reject</button>
+                            <input type="hidden" name="appointment_id" value="<?= $appointment['appointment_id']; ?>">
+                        </form>
+                        <?php elseif ($appointment['status'] == 'confirmed' || $appointment['status'] == 'rejected'): ?>
+                        <form action="professional_dashboard.php" method="POST" style="display:inline;">
+                            <button type="submit" name="action" value="reverse" class="reverse">Reverse</button>
+                            <input type="hidden" name="appointment_id" value="<?= $appointment['appointment_id']; ?>">
+                        </form>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </td>
                 <td><?= ucfirst($appointment['adminstatus']); ?></td>

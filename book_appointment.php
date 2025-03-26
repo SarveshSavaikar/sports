@@ -150,7 +150,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <option value="" disabled selected>Select a professional</option>
                 <?php foreach ($professionals as $professional): ?>
                     <option value="<?= $professional['id']; ?>">
-                        <?= htmlspecialchars($professional['name']); ?> (<?= htmlspecialchars($professional['post']); ?>) - ₹<?= htmlspecialchars($professional['prize_charged']); ?>
+                        <?= htmlspecialchars($professional['name']); ?> (<?= htmlspecialchars($professional['post']); ?>) 
                     </option>
                 <?php endforeach; ?>
             </select>

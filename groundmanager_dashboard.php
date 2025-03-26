@@ -129,7 +129,7 @@ $user = $_SESSION['user'];
 </head>
 <body>
     <header>
-        <h1>Welcome, Admin</h1>
+        <h1>Welcome, Ground Manager</h1>
         <p>Hello, <?php echo $user['name']; ?>!</p>
         <a href="logout.php">Logout</a>
     </header>

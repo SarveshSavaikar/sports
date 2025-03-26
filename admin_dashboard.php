@@ -137,7 +137,7 @@ $user = $_SESSION['user'];
     <nav>
         <ul>
             <li><a href="appointments.php">View Appointments</a></li>
-            <li><a href="appointments.php">Manage Appointments</a></li>
+            <li><a href="professional_dashboard.php">Manage Appointments</a></li>
             <li><a href="manage_users.php">Manage Users</a></li>
             <!-- <li><a href="manage_resources.php">Add Ground</a></li> -->
             <li><a href="manage_equipment.php">Add Equipment</a></li>
