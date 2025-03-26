@@ -45,16 +45,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['payment_done'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Confirmation</title>
+    <style>
+        * {
+            font-family: Arial, sans-serif;
+            margin-top: 10px;
+        }
+        p {
+            font-size: 20px;
+        }
+        label {
+            font-weight: bold;
+            font-size: 25px;
+        }
+        .main-container {
+            max-width: 550px;
+            height: 300px;
+            margin-left:650px ;
+            margin-top:250px ;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            background-color: #f9f9f9;
+            box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.5);
+            
+        }
+        body {
+            background-color:rgb(74, 139, 214);
+        }
+    </style>
 </head>
+
 <body>
 
+<div class="main-container">
 <h1>Booking Confirmation</h1>
+
+<hr>
+
 
 <p><strong>Customer Name:</strong> <?= htmlspecialchars($appointment['customer_name']); ?></p>
 <p><strong>Professional:</strong> <?= htmlspecialchars($appointment['professional_name']); ?></p>
 <p><strong>Appointment Date:</strong> <?= htmlspecialchars($appointment['appointment_date']); ?></p>
 <p><strong>Appointment Time:</strong> <?= htmlspecialchars($appointment['appointment_time']); ?></p>
-<p><strong>Prize Charged:</strong> ₹<?= htmlspecialchars($appointment['prize_charged']); ?></p>
+<!-- <p><strong>Prize Charged:</strong> ₹<?= htmlspecialchars($appointment['prize_charged']); ?></p> -->
 
 
 <form action="<?= $_SERVER['PHP_SELF']; ?>?appointment_id=<?= $appointment_id; ?>" method="post">
@@ -67,6 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['payment_done'])) {
 
     <button type="submit">Submit</button>
 </form>
+</div>
 
 </body>
 </html>
